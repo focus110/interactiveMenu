@@ -197,6 +197,30 @@ export default function InteractiveMenu(props) {
         return `${padding || 0}px`
     }
 
+    const getNameDescColPadding = () => {
+        const p = props.nameDescCol
+        if (!p) return "0px"
+        return p.paddingPerSide
+            ? `${p.paddingTop || 0}px ${p.paddingRight || 0}px ${p.paddingBottom || 0}px ${p.paddingLeft || 0}px`
+            : `${p.padding || 0}px`
+    }
+
+    const getNameDescColBorderRadius = () => {
+        const p = props.nameDescCol
+        if (!p) return "0px"
+        return p.borderRadiusPerCorner
+            ? `${p.borderTopLeft || 0}px ${p.borderTopRight || 0}px ${p.borderBottomRight || 0}px ${p.borderBottomLeft || 0}px`
+            : `${p.borderRadius || 0}px`
+    }
+
+    const getNameDescColBorderWidth = () => {
+        const p = props.nameDescCol
+        if (!p) return "0px"
+        return p.borderWidthPerSide
+            ? `${p.borderTop || 0}px ${p.borderRight || 0}px ${p.borderBottom || 0}px ${p.borderLeft || 0}px`
+            : `${p.borderWidth || 0}px`
+    }
+
     const getColumnWidth = (columnType, widthType, value, maxWidth) => {
         switch (widthType) {
             case "fit-content":
@@ -859,7 +883,7 @@ export default function InteractiveMenu(props) {
             <div style={imageColumnStyle}>
                 {currentItem && (
                     <img
-                        // key={currentItem.Image}
+                        key={currentItem.Image}
                         src={currentItem.Image}
                         alt={currentItem["Image:alt"]}
                         style={{
@@ -1094,11 +1118,43 @@ export default function InteractiveMenu(props) {
 
                                                 <div
                                                     style={{
-                                                        width: "100%",
-                                                        flex: "1 1 0",
+                                                        width:
+                                                            props.nameDescCol
+                                                                ?.width ||
+                                                            "100%",
+                                                        flex:
+                                                            props.nameDescCol
+                                                                ?.flex ||
+                                                            "1 1 0",
                                                         display: "flex",
-                                                        flexDirection: "column",
-                                                        alignItems: "center",
+                                                        flexDirection:
+                                                            props.nameDescCol
+                                                                ?.flexDirection ||
+                                                            "column",
+                                                        alignItems:
+                                                            props.nameDescCol
+                                                                ?.alignItems ||
+                                                            "center",
+                                                        justifyContent:
+                                                            props.nameDescCol
+                                                                ?.justifyContent ||
+                                                            "flex-start",
+                                                        gap: `${props.nameDescCol?.gap || 0}px`,
+                                                        padding:
+                                                            getNameDescColPadding(),
+                                                        borderRadius:
+                                                            getNameDescColBorderRadius(),
+                                                        borderWidth:
+                                                            getNameDescColBorderWidth(),
+                                                        borderStyle:
+                                                            props.nameDescCol
+                                                                ?.borderStyle,
+                                                        borderColor:
+                                                            props.nameDescCol
+                                                                ?.borderColor,
+                                                        backgroundColor:
+                                                            props.nameDescCol
+                                                                ?.backgroundColor,
                                                     }}
                                                 >
                                                     <div
@@ -3118,7 +3174,131 @@ addPropertyControls(InteractiveMenu, {
             },
         },
     },
-
+    nameDescCol: {
+        type: ControlType.Object,
+        title: "Name/Desc Col",
+        controls: {
+            width: {
+                type: ControlType.String,
+                title: "Width",
+                defaultValue: "100%",
+            },
+            flex: {
+                type: ControlType.String,
+                title: "Flex",
+                defaultValue: "1 1 0",
+            },
+            flexDirection: {
+                type: ControlType.Enum,
+                title: "Direction",
+                options: ["row", "column", "row-reverse", "column-reverse"],
+                optionTitles: [
+                    "Row",
+                    "Column",
+                    "Row Reverse",
+                    "Column Reverse",
+                ],
+                defaultValue: "column",
+            },
+            alignItems: {
+                type: ControlType.Enum,
+                title: "Align Items",
+                options: ["flex-start", "center", "flex-end", "stretch"],
+                optionTitles: ["Start", "Center", "End", "Stretch"],
+                defaultValue: "center",
+            },
+            justifyContent: {
+                type: ControlType.Enum,
+                title: "Justify Content",
+                options: [
+                    "flex-start",
+                    "center",
+                    "flex-end",
+                    "space-between",
+                    "space-around",
+                    "space-evenly",
+                ],
+                optionTitles: [
+                    "Start",
+                    "Center",
+                    "End",
+                    "Space Between",
+                    "Space Around",
+                    "Space Evenly",
+                ],
+                defaultValue: "flex-start",
+            },
+            gap: {
+                type: ControlType.Number,
+                title: "Gap",
+                defaultValue: 0,
+                min: 0,
+                unit: "px",
+            },
+            padding: {
+                type: ControlType.FusedNumber,
+                title: "Padding",
+                toggleKey: "paddingPerSide",
+                toggleTitles: ["All Sides", "Per Side"],
+                valueKeys: [
+                    "paddingTop",
+                    "paddingRight",
+                    "paddingBottom",
+                    "paddingLeft",
+                ],
+                valueLabels: ["T", "R", "B", "L"],
+                min: 0,
+                unit: "px",
+            },
+            borderRadius: {
+                type: ControlType.FusedNumber,
+                title: "Border Radius",
+                toggleKey: "borderRadiusPerCorner",
+                toggleTitles: ["All Corners", "Per Corner"],
+                valueKeys: [
+                    "borderTopLeft",
+                    "borderTopRight",
+                    "borderBottomRight",
+                    "borderBottomLeft",
+                ],
+                valueLabels: ["TL", "TR", "BR", "BL"],
+                min: 0,
+                unit: "px",
+            },
+            borderWidth: {
+                type: ControlType.FusedNumber,
+                title: "Border Width",
+                toggleKey: "borderWidthPerSide",
+                toggleTitles: ["All Sides", "Per Side"],
+                valueKeys: [
+                    "borderTop",
+                    "borderRight",
+                    "borderBottom",
+                    "borderLeft",
+                ],
+                valueLabels: ["T", "R", "B", "L"],
+                min: 0,
+                unit: "px",
+            },
+            borderStyle: {
+                type: ControlType.Enum,
+                title: "Border Style",
+                options: ["solid", "dashed", "dotted", "double"],
+                optionTitles: ["Solid", "Dashed", "Dotted", "Double"],
+                defaultValue: "solid",
+            },
+            borderColor: {
+                type: ControlType.Color,
+                title: "Border Color",
+                defaultValue: "#000000",
+            },
+            backgroundColor: {
+                type: ControlType.Color,
+                title: "Background",
+                defaultValue: "transparent",
+            },
+        },
+    },
     backgroundColor: {
         type: ControlType.Color,
         title: "Fill",
