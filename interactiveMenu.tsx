@@ -907,7 +907,6 @@ export default function InteractiveMenu(props) {
             <div style={imageColumnStyle}>
                 {currentItem && (
                     <img
-                        key={currentItem.Image}
                         src={currentItem.Image}
                         alt={currentItem["Image:alt"]}
                         style={{
