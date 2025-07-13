@@ -39,7 +39,7 @@ export default function ScrollToCategoryMenu(props) {
                 if (el) {
                     const rect = el.getBoundingClientRect()
                     const top = rect.top + window.scrollY
-                    if (window.scrollY + offset >= top) {
+                    if (window.scrollY + offset > top) {
                         current = category.id
                     }
                 }
@@ -57,7 +57,7 @@ export default function ScrollToCategoryMenu(props) {
         const el = document.getElementById(id)
         if (el) {
             const rect = el.getBoundingClientRect()
-            const scrollTop = window.scrollY + rect.top - offset
+            const scrollTop = window.scrollY + rect.top - offset + 1
 
             window.scrollTo({
                 top: scrollTop,
@@ -132,7 +132,7 @@ addPropertyControls(ScrollToCategoryMenu, {
     offset: {
         type: ControlType.Number,
         title: "Offset Y",
-        defaultValue: 50,
+        defaultValue: 0,
         displayStepper: true,
     },
     direction: {
