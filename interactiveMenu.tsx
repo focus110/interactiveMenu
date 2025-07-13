@@ -95,6 +95,10 @@ export default function InteractiveMenu(props) {
 
     const [loaded, setLoaded] = useState(false)
 
+    const allCategories = Array.from(
+        new Set(defaultMenuData.map((item) => item.Category.trim()))
+    )
+
     useEffect(() => {
         const handleScroll = () => {
             const rect = containerRef.current?.getBoundingClientRect()
@@ -774,6 +778,7 @@ export default function InteractiveMenu(props) {
                 }
             }
             acc[category].items.push(item)
+
             return acc
         }, {})
 
@@ -785,7 +790,26 @@ export default function InteractiveMenu(props) {
             })
         })
 
-        setGroupedMenu(grouped)
+        let orderedGrouped = grouped
+
+        if (props.categoryOrder && props.categoryOrder.length > 0) {
+            orderedGrouped = {}
+
+            props.categoryOrder.forEach((cat) => {
+                const category = cat.trim()
+                if (grouped[category]) {
+                    orderedGrouped[category] = grouped[category]
+                }
+            })
+
+            Object.keys(grouped).forEach((cat) => {
+                if (!orderedGrouped[cat]) {
+                    orderedGrouped[cat] = grouped[cat]
+                }
+            })
+        }
+
+        setGroupedMenu(orderedGrouped)
     }, [menuData])
 
     const handleItemHover = (item) => {
@@ -1391,6 +1415,15 @@ addPropertyControls(InteractiveMenu, {
             },
         },
     },
+    categoryOrder: {
+        type: ControlType.Array,
+        title: "Order Category ",
+        control: {
+            type: ControlType.String,
+            placeholder: "e.g. SASHIMI",
+        },
+    },
+
     layoutOptions: {
         type: ControlType.Object,
         title: "Layout Options",
