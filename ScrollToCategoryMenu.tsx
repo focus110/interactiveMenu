@@ -1,16 +1,16 @@
 import { addPropertyControls, ControlType } from "framer"
 import { useEffect, useState } from "react"
 
-/**
- * @framerSupportedLayoutWidth auto
- * @framerSupportedLayoutHeight auto
- */
 export default function ScrollToCategoryMenu(props) {
     const {
         categories = [],
         offset = 50,
+        offsetPercentage = 0,
+        maxOffset = 400,
         activeColor = "#007aff",
         inactiveColor = "#ccc",
+        activeTextColor = "#ffffff",
+        inactiveTextColor = "#000000",
         direction = "row",
         gap = 8,
         paddingPerSide,
@@ -19,66 +19,106 @@ export default function ScrollToCategoryMenu(props) {
         paddingBottom = 0,
         paddingLeft = 0,
         padding = 0,
-        borderRadiusPerCorner,
-        borderRadiusTopLeft = 4,
-        borderRadiusTopRight = 4,
-        borderRadiusBottomRight = 4,
-        borderRadiusBottomLeft = 4,
-        borderRadius = 4,
+        buttonPaddingPerSide,
+        buttonPaddingTop = 8,
+        buttonPaddingRight = 12,
+        buttonPaddingBottom = 8,
+        buttonPaddingLeft = 12,
+        buttonPadding = 8,
+        buttonRadiusPerCorner,
+        buttonRadiusTopLeft = 4,
+        buttonRadiusTopRight = 4,
+        buttonRadiusBottomRight = 4,
+        buttonRadiusBottomLeft = 4,
+        buttonRadius = 4,
         font,
         style,
     } = props
 
     const [activeId, setActiveId] = useState("")
 
-    useEffect(() => {
-        const handleScroll = () => {
-            let current = ""
-            for (const category of categories) {
-                const el = document.getElementById(category.id)
-                if (el) {
-                    const rect = el.getBoundingClientRect()
-                    const top = rect.top + window.scrollY
-                    if (window.scrollY + offset > top) {
-                        current = category.id
-                    }
+    const calculateOffset = () => {
+        if (offsetPercentage > 0) {
+            const dynamicOffset = window.innerHeight * (offsetPercentage / 100)
+            return Math.min(dynamicOffset, maxOffset)
+        }
+        return offset
+    }
+
+    const handleScroll = () => {
+        const currentOffset = calculateOffset()
+        let current = categories[0]?.id || ""
+
+        for (let i = 0; i < categories.length; i++) {
+            const el = document.getElementById(categories[i].id)
+            if (el) {
+                const rect = el.getBoundingClientRect()
+                const top = rect.top + window.scrollY
+
+                const nextCategory = categories[i + 1]
+                const nextEl = nextCategory
+                    ? document.getElementById(nextCategory.id)
+                    : null
+                const nextTop = nextEl
+                    ? nextEl.getBoundingClientRect().top + window.scrollY
+                    : Infinity
+
+                if (
+                    window.scrollY + currentOffset >= top &&
+                    window.scrollY + currentOffset < nextTop
+                ) {
+                    current = categories[i].id
+                    break
                 }
             }
-            if (current) setActiveId(current)
         }
 
+        setActiveId(current)
+    }
+
+    useEffect(() => {
         window.addEventListener("scroll", handleScroll)
-        handleScroll() // Initial call to set active on mount
+        handleScroll() // initial
 
         return () => window.removeEventListener("scroll", handleScroll)
-    }, [categories, offset])
+    }, [categories, offset, offsetPercentage, maxOffset])
 
-    const scrollTo = (id) => {
+    const scrollTo = (id: string) => {
         const el = document.getElementById(id)
         if (el) {
             const rect = el.getBoundingClientRect()
-            const scrollTop = window.scrollY + rect.top - offset + 1
+            const adjustment = 30 // 👈 Hier zusätzliche Pixel „vorgaukeln“
+
+            const scrollTop =
+                window.scrollY + rect.top - calculateOffset() + adjustment
 
             window.scrollTo({
                 top: scrollTop,
                 behavior: "smooth",
             })
+
+            // Sofort aktiv für UI-Feedback
+            setActiveId(id)
+
+            // Scroll-Handler nach kurzer Zeit erneut aufrufen
+            setTimeout(() => handleScroll(), 300)
         }
     }
 
-    const getPadding = () => {
-        if (paddingPerSide) {
-            return `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`
-        }
-        return `${padding}px`
-    }
+    const getPadding = () =>
+        paddingPerSide
+            ? `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`
+            : `${padding}px`
 
-    const getBorderRadius = () => {
-        if (borderRadiusPerCorner) {
-            return `${borderRadiusTopLeft}px ${borderRadiusTopRight}px ${borderRadiusBottomRight}px ${borderRadiusBottomLeft}px`
-        }
-        return `${borderRadius}px`
-    }
+    const getButtonPadding = () =>
+        buttonPaddingPerSide
+            ? `${buttonPaddingTop}px ${buttonPaddingRight}px ${buttonPaddingBottom}px ${buttonPaddingLeft}px`
+            : `${buttonPadding}px`
+
+    const getButtonRadius = () =>
+        buttonRadiusPerCorner
+            ? `${buttonRadiusTopLeft}px ${buttonRadiusTopRight}px ${buttonRadiusBottomRight}px ${buttonRadiusBottomLeft}px`
+            : `${buttonRadius}px`
 
     return (
         <div
@@ -95,16 +135,20 @@ export default function ScrollToCategoryMenu(props) {
                     key={category.id}
                     onClick={() => scrollTo(category.id)}
                     style={{
-                        padding: "8px 12px",
+                        padding: getButtonPadding(),
                         border: "none",
-                        borderRadius: getBorderRadius(),
+                        borderRadius: getButtonRadius(),
                         backgroundColor:
                             activeId === category.id
                                 ? activeColor
                                 : inactiveColor,
-                        color: "#fff",
+                        color:
+                            activeId === category.id
+                                ? activeTextColor
+                                : inactiveTextColor,
                         cursor: "pointer",
-                        transition: "background-color 0.2s ease",
+                        transition:
+                            "background-color 0.2s ease, color 0.2s ease",
                         ...font,
                     }}
                 >
@@ -131,8 +175,22 @@ addPropertyControls(ScrollToCategoryMenu, {
     },
     offset: {
         type: ControlType.Number,
-        title: "Offset Y",
+        title: "Offset (px)",
+        defaultValue: 50,
+        displayStepper: true,
+    },
+    offsetPercentage: {
+        type: ControlType.Number,
+        title: "Offset (% vh)",
         defaultValue: 0,
+        min: 0,
+        max: 100,
+        displayStepper: true,
+    },
+    maxOffset: {
+        type: ControlType.Number,
+        title: "Max Offset (px)",
+        defaultValue: 400,
         displayStepper: true,
     },
     direction: {
@@ -163,6 +221,36 @@ addPropertyControls(ScrollToCategoryMenu, {
         valueLabels: ["T", "R", "B", "L"],
         min: 0,
     },
+    buttonPadding: {
+        type: ControlType.FusedNumber,
+        title: "Button Padding",
+        defaultValue: 8,
+        toggleKey: "buttonPaddingPerSide",
+        toggleTitles: ["All Sides", "Per Side"],
+        valueKeys: [
+            "buttonPaddingTop",
+            "buttonPaddingRight",
+            "buttonPaddingBottom",
+            "buttonPaddingLeft",
+        ],
+        valueLabels: ["T", "R", "B", "L"],
+        min: 0,
+    },
+    buttonRadius: {
+        type: ControlType.FusedNumber,
+        title: "Button Radius",
+        defaultValue: 4,
+        toggleKey: "buttonRadiusPerCorner",
+        toggleTitles: ["All Corners", "Per Corner"],
+        valueKeys: [
+            "buttonRadiusTopLeft",
+            "buttonRadiusTopRight",
+            "buttonRadiusBottomRight",
+            "buttonRadiusBottomLeft",
+        ],
+        valueLabels: ["TL", "TR", "BR", "BL"],
+        min: 0,
+    },
     activeColor: {
         type: ControlType.Color,
         title: "Active Color",
@@ -172,6 +260,16 @@ addPropertyControls(ScrollToCategoryMenu, {
         type: ControlType.Color,
         title: "Inactive Color",
         defaultValue: "#ccc",
+    },
+    activeTextColor: {
+        type: ControlType.Color,
+        title: "Active Text Color",
+        defaultValue: "#ffffff",
+    },
+    inactiveTextColor: {
+        type: ControlType.Color,
+        title: "Inactive Text Color",
+        defaultValue: "#000000",
     },
     font: {
         type: ControlType.Font,
