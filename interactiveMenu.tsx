@@ -420,6 +420,10 @@ export default function InteractiveMenu(props) {
             : `${base.borderRadius || 0}px`
     }
 
+    const paddingDesc = props.descCol.paddingPerSide
+        ? `${props.descCol.paddingTop}px ${props.descCol.paddingRight}px ${props.descCol.paddingBottom}px ${props.descCol.paddingLeft}px`
+        : `${props.descCol.paddingTop}px`
+
     const isPinnedActive = isPinned && props.enablePinnedImageStyles
     const pinnedContainer = props.pinnedContainerStyles
     const containerBase = props.layoutOptions
@@ -1141,28 +1145,21 @@ export default function InteractiveMenu(props) {
 
                                                 <div
                                                     style={{
-                                                        width:
-                                                            props.nameDescCol
-                                                                ?.width ||
-                                                            "100%",
-                                                        flex:
-                                                            props.nameDescCol
-                                                                ?.flex ||
-                                                            "1 1 0",
+                                                        width: props.nameDescCol
+                                                            ?.width,
+                                                        flex: props.nameDescCol
+                                                            ?.flex,
                                                         display: "flex",
                                                         flexDirection:
                                                             props.nameDescCol
-                                                                ?.flexDirection ||
-                                                            "column",
+                                                                ?.flexDirection,
                                                         alignItems:
                                                             props.nameDescCol
-                                                                ?.alignItems ||
-                                                            "center",
+                                                                ?.alignItems,
                                                         justifyContent:
                                                             props.nameDescCol
-                                                                ?.justifyContent ||
-                                                            "flex-start",
-                                                        gap: `${props.nameDescCol?.gap || 0}px`,
+                                                                ?.justifyContent,
+                                                        gap: `${props.nameDescCol?.gap}px`,
                                                         padding:
                                                             getNameDescColPadding(),
                                                         borderRadius:
@@ -1265,12 +1262,26 @@ export default function InteractiveMenu(props) {
 
                                                     <div
                                                         style={{
-                                                            width: "100%",
+                                                            width: props.descCol
+                                                                .width,
                                                             display: "flex",
                                                             flexDirection:
-                                                                "column",
+                                                                props.descCol
+                                                                    .flexDirection,
                                                             alignItems:
-                                                                "flex-start",
+                                                                props.descCol
+                                                                    .alignItems,
+                                                            justifyContent:
+                                                                props.descCol
+                                                                    .justifyContent,
+                                                            gap: props.descCol
+                                                                .gap,
+                                                            padding:
+                                                                props.descCol
+                                                                    .padding,
+                                                            backgroundColor:
+                                                                props.descCol
+                                                                    .backgroundColor,
                                                         }}
                                                     >
                                                         <div
@@ -3323,6 +3334,79 @@ addPropertyControls(InteractiveMenu, {
                 type: ControlType.Color,
                 title: "Border Color",
                 defaultValue: "#000000",
+            },
+            backgroundColor: {
+                type: ControlType.Color,
+                title: "Background",
+                defaultValue: "transparent",
+            },
+        },
+    },
+
+    descCol: {
+        type: ControlType.Object,
+        title: "Desc COl",
+        controls: {
+            width: {
+                type: ControlType.String,
+                title: "Width",
+                defaultValue: "100%",
+                placeholder: "100%, 300px, auto...",
+            },
+            flexDirection: {
+                type: ControlType.Enum,
+                title: "Direction",
+                options: ["row", "column", "row-reverse", "column-reverse"],
+                defaultValue: "column",
+            },
+            alignItems: {
+                type: ControlType.Enum,
+                title: "Align Items",
+                options: [
+                    "flex-start",
+                    "center",
+                    "flex-end",
+                    "stretch",
+                    "baseline",
+                ],
+                defaultValue: "flex-start",
+            },
+            justifyContent: {
+                type: ControlType.Enum,
+                title: "Justify Content",
+                options: [
+                    "flex-start",
+                    "center",
+                    "flex-end",
+                    "space-between",
+                    "space-around",
+                    "space-evenly",
+                ],
+                defaultValue: "flex-start",
+            },
+            gap: {
+                type: ControlType.Number,
+                title: "Gap",
+                defaultValue: 0,
+                min: 0,
+                max: 100,
+                step: 1,
+                unit: "px",
+            },
+            padding: {
+                type: ControlType.FusedNumber,
+                title: "Padding",
+                defaultValue: 0,
+                toggleKey: "paddingPerSide",
+                toggleTitles: ["All Sides", "Per Side"],
+                valueKeys: [
+                    "paddingTop",
+                    "paddingRight",
+                    "paddingBottom",
+                    "paddingLeft",
+                ],
+                valueLabels: ["T", "R", "B", "L"],
+                min: 0,
             },
             backgroundColor: {
                 type: ControlType.Color,
