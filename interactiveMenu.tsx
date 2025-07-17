@@ -91,7 +91,6 @@ export default function InteractiveMenu(props) {
     const [isMobile, setIsMobile] = useState(false)
     const [groupedMenu, setGroupedMenu] = useState({})
     const containerRef = useRef<HTMLDivElement>(null)
-    const [isPinned, setIsPinned] = useState(false)
 
     const [loaded, setLoaded] = useState(false)
 
@@ -103,9 +102,6 @@ export default function InteractiveMenu(props) {
         const handleScroll = () => {
             const rect = containerRef.current?.getBoundingClientRect()
             if (!rect) return
-
-            const isAtTop = rect.top <= 0
-            setIsPinned(isAtTop)
         }
 
         window.addEventListener("scroll", handleScroll)
@@ -381,28 +377,6 @@ export default function InteractiveMenu(props) {
             : `${layout.borderRadius}px`
     }
 
-    const getPinnedContainerPadding = () => {
-        const p = props.pinnedContainerStyles
-        if (!p) return "0px"
-        return p.paddingPerSide
-            ? `${p.paddingTop || 0}px ${p.paddingRight || 0}px ${p.paddingBottom || 0}px ${p.paddingLeft || 0}px`
-            : `${p.padding || 0}px`
-    }
-    const getPinnedContainerBorderRadius = () => {
-        const p = props.pinnedContainerStyles
-        if (!p) return "0px"
-        return p.borderRadiusPerCorner
-            ? `${p.borderTopLeft || 0}px ${p.borderTopRight || 0}px ${p.borderBottomRight || 0}px ${p.borderBottomLeft || 0}px`
-            : `${p.borderRadius || 0}px`
-    }
-    const getPinnedContainerBorderWidth = () => {
-        const p = props.pinnedContainerStyles
-        if (!p) return "0px"
-        return p.borderWidthPerSide
-            ? `${p.borderTop || 0}px ${p.borderRight || 0}px ${p.borderBottom || 0}px ${p.borderLeft || 0}px`
-            : `${p.borderWidth || 0}px`
-    }
-
     const getContainerBorderWidth = () => {
         const base = props.layoutOptions
         if (!base) return "0px"
@@ -424,105 +398,34 @@ export default function InteractiveMenu(props) {
         ? `${props.descCol.paddingTop}px ${props.descCol.paddingRight}px ${props.descCol.paddingBottom}px ${props.descCol.paddingLeft}px`
         : `${props.descCol.paddingTop}px`
 
-    const isPinnedActive = isPinned && props.enablePinnedImageStyles
-    const pinnedContainer = props.pinnedContainerStyles
     const containerBase = props.layoutOptions
 
     const containerStyle = {
         width: "100%",
-        // minHeight: "100vh",
         display: containerBase.display,
         gap: `${containerBase.gap}px`,
         flexDirection: props.layoutOptions?.flexDirection,
         justifyContent: containerBase.justifyContent,
         alignItems: containerBase.alignItems,
         fontFamily: "Host Grotesk, sans-serif",
-        position:
-            isPinnedActive && pinnedContainer.position !== undefined
-                ? pinnedContainer.position
-                : containerBase.position,
-        top:
-            isPinnedActive && pinnedContainer.top !== undefined
-                ? pinnedContainer.top
-                : containerBase.top,
-        right:
-            isPinnedActive && pinnedContainer.right !== undefined
-                ? pinnedContainer.right
-                : containerBase.right,
-        bottom:
-            isPinnedActive && pinnedContainer.bottom !== undefined
-                ? pinnedContainer.bottom
-                : containerBase.bottom,
-        left:
-            isPinnedActive && pinnedContainer.left !== undefined
-                ? pinnedContainer.left
-                : containerBase.left,
-        zIndex:
-            isPinnedActive && pinnedContainer.zIndex !== undefined
-                ? pinnedContainer.zIndex
-                : containerBase.zIndex,
-        backgroundColor:
-            isPinnedActive && pinnedContainer.backgroundColor !== undefined
-                ? pinnedContainer.backgroundColor
-                : containerBase.backgroundColor,
+        position: containerBase.position,
+        top: containerBase.top,
+        right: containerBase.right,
+        bottom: containerBase.bottom,
+        left: containerBase.left,
+        zIndex: containerBase.zIndex,
+        backgroundColor: containerBase.backgroundColor,
 
-        padding:
-            isPinnedActive && pinnedContainer.padding !== undefined
-                ? getPinnedContainerPadding()
-                : getPadding(),
+        padding: getPadding(),
 
-        borderRadius:
-            isPinnedActive && pinnedContainer.borderRadius !== undefined
-                ? getPinnedContainerBorderRadius()
-                : getContainerBorderRadius(),
+        borderRadius: getContainerBorderRadius(),
 
-        borderWidth:
-            isPinnedActive && pinnedContainer.borderWidth !== undefined
-                ? getPinnedContainerBorderWidth()
-                : getContainerBorderWidth(),
+        borderWidth: getContainerBorderWidth(),
 
-        borderStyle:
-            isPinnedActive && pinnedContainer.borderStyle !== undefined
-                ? pinnedContainer.borderStyle
-                : containerBase.borderStyle,
-        borderColor:
-            isPinnedActive && pinnedContainer.borderColor !== undefined
-                ? pinnedContainer.borderColor
-                : containerBase.borderColor,
+        borderStyle: containerBase.borderStyle,
+        borderColor: containerBase.borderColor,
 
-        boxShadow: isPinnedActive
-            ? pinnedContainer.boxShadow.replace(
-                  /rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/,
-                  `rgba($1,$2,$3,${pinnedContainer.shadowOpacity ?? 0.1})`
-              )
-            : containerBase.boxShadow,
-    }
-
-    const getPinnedMenuPadding = () => {
-        const p = props.pinnedMenuColumnStyles
-        if (!p) return "0px"
-
-        return p.paddingPerSide
-            ? `${p.paddingTop || 0}px ${p.paddingRight || 0}px ${p.paddingBottom || 0}px ${p.paddingLeft || 0}px`
-            : `${p.padding || 0}px`
-    }
-
-    const getPinnedMenuBorderRadius = () => {
-        const p = props.pinnedMenuColumnStyles
-        if (!p) return "0px"
-
-        return p.borderRadiusPerCorner
-            ? `${p.borderTopLeft || 0}px ${p.borderTopRight || 0}px ${p.borderBottomRight || 0}px ${p.borderBottomLeft || 0}px`
-            : `${p.borderRadius || 0}px`
-    }
-
-    const getPinnedMenuBorderWidth = () => {
-        const p = props.pinnedMenuColumnStyles
-        if (!p) return "0px"
-
-        return p.borderWidthPerSide
-            ? `${p.borderTop || 0}px ${p.borderRight || 0}px ${p.borderBottom || 0}px ${p.borderLeft || 0}px`
-            : `${p.borderWidth || 0}px`
+        boxShadow: containerBase.boxShadow,
     }
 
     const getMenuColumnBorderRadius = () => {
@@ -543,9 +446,8 @@ export default function InteractiveMenu(props) {
             : `${base.borderWidth || 0}px`
     }
 
-    const pinnedMenu = props.pinnedMenuColumnStyles || {}
     const menuColumnBase = props.menuColumnSettings || {}
-    const activeMenu = isPinnedActive ? pinnedMenu : menuColumnBase
+    const activeMenu = menuColumnBase
 
     const menuColumnStyle = {
         ...getColumnWidth(
@@ -555,9 +457,7 @@ export default function InteractiveMenu(props) {
             menuColumnMaxWidth
         ),
 
-        padding: isPinnedActive
-            ? getPinnedMenuPadding()
-            : getMenuColumnPadding(),
+        padding: getMenuColumnPadding(),
         display: props.menuColumnDisplay || "flex",
         flexDirection: props.menuColumnFlexDirection || "column",
         gap: `${props.menuColumnGap}px`,
@@ -576,22 +476,12 @@ export default function InteractiveMenu(props) {
         left: activeMenu.left,
         zIndex: activeMenu.zIndex,
         backgroundColor: activeMenu.backgroundColor,
-        borderRadius: isPinnedActive
-            ? getPinnedMenuBorderRadius()
-            : getMenuColumnBorderRadius(),
+        borderRadius: getMenuColumnBorderRadius(),
 
-        borderWidth: isPinnedActive
-            ? getPinnedMenuBorderWidth()
-            : getMenuColumnBorderWidth(),
+        borderWidth: getMenuColumnBorderWidth(),
         borderStyle: activeMenu.borderStyle,
         borderColor: activeMenu.borderColor,
-        boxShadow:
-            isPinnedActive && pinnedMenu.boxShadow
-                ? pinnedMenu.boxShadow.replace(
-                      /rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/,
-                      `rgba($1,$2,$3,${pinnedMenu.shadowOpacity ?? 0.1})`
-                  )
-                : menuColumnBase.boxShadow,
+        boxShadow: menuColumnBase.boxShadow,
     }
 
     const categoryHeaderStyle = {
@@ -646,32 +536,7 @@ export default function InteractiveMenu(props) {
         }
     }
 
-    const getPinnedPadding = () => {
-        const s = props.pinnedImageStyles
-        if (!s) return "0px"
-        return s.paddingPerSide
-            ? `${s.paddingTop || 0}px ${s.paddingRight || 0}px ${s.paddingBottom || 0}px ${s.paddingLeft || 0}px`
-            : `${s.padding || 0}px`
-    }
-
-    const getPinnedBorderRadius = () => {
-        const s = props.pinnedImageStyles
-        if (!s) return "0px"
-        return s.borderRadiusPerCorner
-            ? `${s.borderTopLeft || 0}px ${s.borderTopRight || 0}px ${s.borderBottomRight || 0}px ${s.borderBottomLeft || 0}px`
-            : `${s.borderRadius || 0}px`
-    }
-
-    const getPinnedBorderWidth = () => {
-        const p = props.pinnedImageStyles
-        if (!p) return "0px"
-        return p.borderWidthPerSide
-            ? `${p.borderTop || 0}px ${p.borderRight || 0}px ${p.borderBottom || 0}px ${p.borderLeft || 0}px`
-            : `${p.borderWidth || 0}px`
-    }
-
     const s = props.imageSettings || {}
-    const p = props.pinnedImageStyles || {}
     const c = props.imageColumnSettings || {}
 
     const imageColumnStyle = {
@@ -679,33 +544,23 @@ export default function InteractiveMenu(props) {
         justifyContent: "center",
         alignItems: "center",
 
-        position: isPinnedActive ? p.position : imageColumnPosition,
-        top: isPinnedActive ? p.top : imageColumnTop,
-        right: isPinnedActive ? p.right : imageColumnRight,
-        bottom: isPinnedActive ? p.bottom : imageColumnBottom,
-        left: isPinnedActive ? p.left : imageColumnLeft,
-        zIndex: isPinnedActive ? p.zIndex : imageColumnZIndex,
+        position: imageColumnPosition,
+        top: imageColumnTop,
+        right: imageColumnRight,
+        bottom: imageColumnBottom,
+        left: imageColumnLeft,
+        zIndex: imageColumnZIndex,
 
-        maxWidth: isPinnedActive
-            ? p.maxWidth || c.imageColumnMaxWidth
-            : c.imageColumnMaxWidth,
-        maxHeight: isPinnedActive
-            ? p.maxHeight || c.imageColumnMaxHeight
-            : c.imageColumnMaxHeight,
+        maxWidth: c.imageColumnMaxWidth,
+        maxHeight: c.imageColumnMaxHeight,
 
-        backgroundColor: isPinnedActive
-            ? p.backgroundColor
-            : imageColumnBackground,
-        padding: isPinnedActive ? getPinnedPadding() : getImageColumnPadding(),
-        borderRadius: isPinnedActive
-            ? getPinnedBorderRadius()
-            : getImageColumnBorderRadius(),
+        backgroundColor: imageColumnBackground,
+        padding: getImageColumnPadding(),
+        borderRadius: getImageColumnBorderRadius(),
 
-        borderWidth: isPinnedActive
-            ? getPinnedBorderWidth()
-            : getImageColumnBorderWidth(),
-        borderStyle: isPinnedActive ? p.borderStyle : c.imageColumnBorderStyle,
-        borderColor: isPinnedActive ? p.borderColor : c.imageColumnBorderColor,
+        borderWidth: getImageColumnBorderWidth(),
+        borderStyle: c.imageColumnBorderStyle,
+        borderColor: c.imageColumnBorderColor,
 
         ...getColumnWidth(
             "image",
@@ -717,8 +572,8 @@ export default function InteractiveMenu(props) {
         transform: `
         scale(${s.imageTransformScale})
         rotate(${s.imageTransformRotate}deg)
-        translateX(${isPinnedActive ? p.translateX : s.imageTransformTranslateX})
-        translateY(${isPinnedActive ? p.translateY : s.imageTransformTranslateY})
+        translateX(${s.imageTransformTranslateX})
+        translateY(${s.imageTransformTranslateY})
     `,
     }
 
@@ -923,7 +778,7 @@ export default function InteractiveMenu(props) {
                 )}
             </div>
 
-            {isPinnedActive ? (
+            {imageColumnPosition === "fixed" ? (
                 <div
                     style={{
                         width: "50%",
@@ -1973,377 +1828,6 @@ addPropertyControls(InteractiveMenu, {
                 // max: 50,
                 // step: 1,
                 unit: "px",
-            },
-        },
-    },
-    enablePinnedImageStyles: {
-        type: ControlType.Boolean,
-        title: "Enable Pinned Styles",
-        defaultValue: false,
-    },
-    pinnedContainerStyles: {
-        type: ControlType.Object,
-        title: "Pinned Container Styles",
-        hidden: (props) => !props.enablePinnedImageStyles,
-        controls: {
-            position: {
-                type: ControlType.Enum,
-                title: "Position",
-                options: ["relative", "absolute", "fixed", "sticky"],
-                optionTitles: ["Relative", "Absolute", "Fixed", "Sticky"],
-                defaultValue: "relative",
-            },
-            top: {
-                type: ControlType.String,
-                title: "Top",
-                defaultValue: "auto",
-            },
-            right: {
-                type: ControlType.String,
-                title: "Right",
-                defaultValue: "auto",
-            },
-            bottom: {
-                type: ControlType.String,
-                title: "Bottom",
-                defaultValue: "auto",
-            },
-            left: {
-                type: ControlType.String,
-                title: "Left",
-                defaultValue: "auto",
-            },
-            zIndex: {
-                type: ControlType.Number,
-                title: "Z-Index",
-                defaultValue: 1,
-            },
-            backgroundColor: {
-                type: ControlType.Color,
-                title: "Background",
-                defaultValue: "transparent",
-            },
-            padding: {
-                type: ControlType.FusedNumber,
-                title: "Padding",
-                toggleKey: "paddingPerSide",
-                toggleTitles: ["All Sides", "Per Side"],
-                valueKeys: [
-                    "paddingTop",
-                    "paddingRight",
-                    "paddingBottom",
-                    "paddingLeft",
-                ],
-                valueLabels: ["T", "R", "B", "L"],
-                min: 0,
-                unit: "px",
-            },
-            borderRadius: {
-                type: ControlType.FusedNumber,
-                title: "Border Radius",
-                toggleKey: "borderRadiusPerCorner",
-                toggleTitles: ["All Corners", "Per Corner"],
-                valueKeys: [
-                    "borderTopLeft",
-                    "borderTopRight",
-                    "borderBottomRight",
-                    "borderBottomLeft",
-                ],
-                valueLabels: ["TL", "TR", "BR", "BL"],
-                min: 0,
-                unit: "px",
-            },
-            borderWidth: {
-                type: ControlType.FusedNumber,
-                title: "Border Width",
-                toggleKey: "borderWidthPerSide",
-                toggleTitles: ["All Sides", "Per Side"],
-                valueKeys: [
-                    "borderTop",
-                    "borderRight",
-                    "borderBottom",
-                    "borderLeft",
-                ],
-                valueLabels: ["T", "R", "B", "L"],
-                min: 0,
-                unit: "px",
-            },
-            borderStyle: {
-                type: ControlType.Enum,
-                title: "Border Style",
-                options: ["solid", "dashed", "dotted", "double"],
-                optionTitles: ["Solid", "Dashed", "Dotted", "Double"],
-                defaultValue: "solid",
-            },
-            borderColor: {
-                type: ControlType.Color,
-                title: "Border Color",
-                defaultValue: "#000",
-            },
-            boxShadow: {
-                type: ControlType.String,
-                title: "Box Shadow",
-                defaultValue: "0px 4px 10px rgba(0, 0, 0, 1)",
-            },
-            shadowOpacity: {
-                type: ControlType.Number,
-                title: "Shadow Opacity",
-                min: 0,
-                max: 1,
-                step: 0.05,
-                defaultValue: 0.1,
-            },
-        },
-    },
-
-    pinnedImageStyles: {
-        type: ControlType.Object,
-        title: "Pinned Image Styles",
-        hidden: (props) => !props.enablePinnedImageStyles,
-        controls: {
-            position: {
-                type: ControlType.Enum,
-                title: "Position",
-                options: ["static", "relative", "absolute", "fixed", "sticky"],
-                optionTitles: [
-                    "Static",
-                    "Relative",
-                    "Absolute",
-                    "Fixed",
-                    "Sticky",
-                ],
-                defaultValue: "static",
-            },
-
-            pinnedImgmaxWidth: {
-                type: ControlType.String,
-                title: "Max Width",
-                defaultValue: "100%",
-            },
-            pinnedImgmaxHeight: {
-                type: ControlType.String,
-                title: "Max Height",
-                defaultValue: "100%",
-            },
-
-            top: {
-                type: ControlType.String,
-                title: "Top",
-                // defaultValue: "50%",
-            },
-            right: {
-                type: ControlType.String,
-                title: "Right",
-                // defaultValue: "auto",
-            },
-            bottom: {
-                type: ControlType.String,
-                title: "Bottom",
-                // defaultValue: "auto",
-            },
-            left: {
-                type: ControlType.String,
-                title: "Left",
-                // defaultValue: "25%",
-            },
-            translateX: {
-                type: ControlType.String,
-                title: "Translate X",
-                // defaultValue: "-50%",
-            },
-            translateY: {
-                type: ControlType.String,
-                title: "Translate Y",
-                // defaultValue: "-50%",
-            },
-            zIndex: {
-                type: ControlType.Number,
-                title: "Z-Index",
-                // defaultValue: 1,
-            },
-            backgroundColor: {
-                type: ControlType.Color,
-                title: "Background",
-                // defaultValue: "transparent",
-            },
-            padding: {
-                type: ControlType.FusedNumber,
-                title: "Padding",
-                toggleKey: "paddingPerSide",
-                toggleTitles: ["All Sides", "Per Side"],
-                valueKeys: [
-                    "paddingTop",
-                    "paddingRight",
-                    "paddingBottom",
-                    "paddingLeft",
-                ],
-                valueLabels: ["T", "R", "B", "L"],
-                min: 0,
-                unit: "px",
-            },
-            borderWidth: {
-                type: ControlType.FusedNumber,
-                title: "Border Width",
-                toggleKey: "borderWidthPerSide",
-                toggleTitles: ["All Sides", "Per Side"],
-                valueKeys: [
-                    "borderTop",
-                    "borderRight",
-                    "borderBottom",
-                    "borderLeft",
-                ],
-                valueLabels: ["T", "R", "B", "L"],
-                min: 0,
-                unit: "px",
-            },
-            borderStyle: {
-                type: ControlType.Enum,
-                title: "Border Style",
-                options: ["solid", "dashed", "dotted", "double"],
-                optionTitles: ["Solid", "Dashed", "Dotted", "Double"],
-                defaultValue: "solid",
-            },
-            borderColor: {
-                type: ControlType.Color,
-                title: "Border Color",
-                defaultValue: "#000",
-            },
-
-            borderRadius: {
-                type: ControlType.FusedNumber,
-                title: "Border Radius",
-                toggleKey: "borderRadiusPerCorner",
-                toggleTitles: ["All Corners", "Per Corner"],
-                valueKeys: [
-                    "borderTopLeft",
-                    "borderTopRight",
-                    "borderBottomRight",
-                    "borderBottomLeft",
-                ],
-                valueLabels: ["TL", "TR", "BR", "BL"],
-                min: 0,
-                unit: "px",
-            },
-        },
-    },
-    pinnedMenuColumnStyles: {
-        type: ControlType.Object,
-        title: "Pinned Menu Styles",
-        hidden: (props) => !props.enablePinnedImageStyles,
-        controls: {
-            position: {
-                type: ControlType.Enum,
-                title: "Position",
-                options: ["static", "relative", "absolute", "fixed", "sticky"],
-                optionTitles: [
-                    "Static",
-                    "Relative",
-                    "Absolute",
-                    "Fixed",
-                    "Sticky",
-                ],
-                defaultValue: "relative",
-            },
-
-            top: {
-                type: ControlType.String,
-                title: "Top",
-                defaultValue: "0px",
-            },
-            right: {
-                type: ControlType.String,
-                title: "Right",
-                defaultValue: "auto",
-            },
-            bottom: {
-                type: ControlType.String,
-                title: "Bottom",
-                defaultValue: "auto",
-            },
-            left: {
-                type: ControlType.String,
-                title: "Left",
-                defaultValue: "0px",
-            },
-            zIndex: {
-                type: ControlType.Number,
-                title: "Z-Index",
-                defaultValue: 2,
-            },
-            backgroundColor: {
-                type: ControlType.Color,
-                title: "Background",
-                defaultValue: "transparent",
-            },
-            padding: {
-                type: ControlType.FusedNumber,
-                title: "Padding",
-                toggleKey: "paddingPerSide",
-                toggleTitles: ["All Sides", "Per Side"],
-                valueKeys: [
-                    "paddingTop",
-                    "paddingRight",
-                    "paddingBottom",
-                    "paddingLeft",
-                ],
-                valueLabels: ["T", "R", "B", "L"],
-                unit: "px",
-                min: 0,
-            },
-            borderRadius: {
-                type: ControlType.FusedNumber,
-                title: "Border Radius",
-                toggleKey: "borderRadiusPerCorner",
-                toggleTitles: ["All Corners", "Per Corner"],
-                valueKeys: [
-                    "borderTopLeft",
-                    "borderTopRight",
-                    "borderBottomRight",
-                    "borderBottomLeft",
-                ],
-                valueLabels: ["TL", "TR", "BR", "BL"],
-                unit: "px",
-                min: 0,
-            },
-            borderWidth: {
-                type: ControlType.FusedNumber,
-                title: "Border Width",
-                toggleKey: "borderWidthPerSide",
-                toggleTitles: ["All Sides", "Per Side"],
-                valueKeys: [
-                    "borderTop",
-                    "borderRight",
-                    "borderBottom",
-                    "borderLeft",
-                ],
-                valueLabels: ["T", "R", "B", "L"],
-                unit: "px",
-                min: 0,
-            },
-            borderStyle: {
-                type: ControlType.Enum,
-                title: "Border Style",
-                options: ["solid", "dashed", "dotted", "double"],
-                optionTitles: ["Solid", "Dashed", "Dotted", "Double"],
-                defaultValue: "solid",
-            },
-            borderColor: {
-                type: ControlType.Color,
-                title: "Border Color",
-                defaultValue: "#000",
-            },
-            boxShadow: {
-                type: ControlType.String,
-                title: "Box Shadow",
-                defaultValue: "0px 4px 10px rgba(0, 0, 0, 1)",
-            },
-            shadowOpacity: {
-                type: ControlType.Number,
-                title: "Shadow Opacity",
-                min: 0,
-                max: 1,
-                step: 0.05,
-                defaultValue: 0.1,
             },
         },
     },
